@@ -1,11 +1,23 @@
--- Char mode.lua
--- Comando ;char para mudar a aparência para outro jogador
--- Criado por Santos & ChatGPT
+-- Char mode com ícone azul na tela
+-- Feito por Santos & ChatGPT
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Função que muda a aparência para o avatar de outro jogador
+-- Cria um ícone azul na tela (usando Drawing)
+local icon = Drawing.new("Image")
+icon.Data = game:HttpGet("https://www.roblox.com/thumbs/image?userId=1&width=420&height=420&format=png") -- você pode trocar por outro link depois
+icon.Size = Vector2.new(60, 60)
+icon.Position = Vector2.new(20, 100) -- canto superior esquerdo
+icon.Visible = true
+
+-- Mensagem de confirmação
+game.StarterGui:SetCore("ChatMakeSystemMessage", {
+    Text = "✅ Char mode ativado! Use ;char nome_do_jogador",
+    Color = Color3.fromRGB(0, 170, 255)
+})
+
+-- Função para trocar o avatar
 local function changeCharacterTo(username)
     local success, userId = pcall(function()
         return Players:GetUserIdFromNameAsync(username)
@@ -20,7 +32,6 @@ local function changeCharacterTo(username)
             Color = Color3.fromRGB(0, 255, 0)
         })
     else
-        warn("❌ Não foi possível encontrar o jogador: " .. username)
         game.StarterGui:SetCore("ChatMakeSystemMessage", {
             Text = "❌ Jogador não encontrado: " .. username,
             Color = Color3.fromRGB(255, 0, 0)
@@ -28,12 +39,66 @@ local function changeCharacterTo(username)
     end
 end
 
--- Escuta o chat e ativa o comando ;char
+-- Ativa o comando ;char
 LocalPlayer.Chatted:Connect(function(msg)
     if msg:lower():sub(1, 6) == ";char " then
-        local targetName = msg:sub(7):gsub("%s+", "") -- remove espaços
-        if targetName ~= "" then
-            changeCharacterTo(targetName)
+        local name = msg:sub(7):gsub("%s+", "")
+        if name ~= "" then
+            changeCharacterTo(name)
+        else
+            game.StarterGui:SetCore("ChatMakeSystemMessage", {
+                Text = "⚠️ Use: ;char nome_do_jogador",
+                Color = Color3.fromRGB(255, 255, 0)
+            })
+        end
+    end
+end)-- Char mode com ícone azul na tela
+-- Feito por Santos & ChatGPT
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Cria um ícone azul na tela (usando Drawing)
+local icon = Drawing.new("Image")
+icon.Data = game:HttpGet("https://www.roblox.com/thumbs/image?userId=1&width=420&height=420&format=png") -- você pode trocar por outro link depois
+icon.Size = Vector2.new(60, 60)
+icon.Position = Vector2.new(20, 100) -- canto superior esquerdo
+icon.Visible = true
+
+-- Mensagem de confirmação
+game.StarterGui:SetCore("ChatMakeSystemMessage", {
+    Text = "✅ Char mode ativado! Use ;char nome_do_jogador",
+    Color = Color3.fromRGB(0, 170, 255)
+})
+
+-- Função para trocar o avatar
+local function changeCharacterTo(username)
+    local success, userId = pcall(function()
+        return Players:GetUserIdFromNameAsync(username)
+    end)
+
+    if success then
+        local desc = Players:GetHumanoidDescriptionFromUserId(userId)
+        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        character:WaitForChild("Humanoid"):ApplyDescription(desc)
+        game.StarterGui:SetCore("ChatMakeSystemMessage", {
+            Text = "✅ Aparência trocada para: " .. username,
+            Color = Color3.fromRGB(0, 255, 0)
+        })
+    else
+        game.StarterGui:SetCore("ChatMakeSystemMessage", {
+            Text = "❌ Jogador não encontrado: " .. username,
+            Color = Color3.fromRGB(255, 0, 0)
+        })
+    end
+end
+
+-- Ativa o comando ;char
+LocalPlayer.Chatted:Connect(function(msg)
+    if msg:lower():sub(1, 6) == ";char " then
+        local name = msg:sub(7):gsub("%s+", "")
+        if name ~= "" then
+            changeCharacterTo(name)
         else
             game.StarterGui:SetCore("ChatMakeSystemMessage", {
                 Text = "⚠️ Use: ;char nome_do_jogador",
