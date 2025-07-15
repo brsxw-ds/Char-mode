@@ -1,0 +1,44 @@
+-- Char mode.lua
+-- Comando ;char para mudar a aparência para outro jogador
+-- Criado por Santos & ChatGPT
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Função que muda a aparência para o avatar de outro jogador
+local function changeCharacterTo(username)
+    local success, userId = pcall(function()
+        return Players:GetUserIdFromNameAsync(username)
+    end)
+
+    if success then
+        local desc = Players:GetHumanoidDescriptionFromUserId(userId)
+        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        character:WaitForChild("Humanoid"):ApplyDescription(desc)
+        game.StarterGui:SetCore("ChatMakeSystemMessage", {
+            Text = "✅ Aparência trocada para: " .. username,
+            Color = Color3.fromRGB(0, 255, 0)
+        })
+    else
+        warn("❌ Não foi possível encontrar o jogador: " .. username)
+        game.StarterGui:SetCore("ChatMakeSystemMessage", {
+            Text = "❌ Jogador não encontrado: " .. username,
+            Color = Color3.fromRGB(255, 0, 0)
+        })
+    end
+end
+
+-- Escuta o chat e ativa o comando ;char
+LocalPlayer.Chatted:Connect(function(msg)
+    if msg:lower():sub(1, 6) == ";char " then
+        local targetName = msg:sub(7):gsub("%s+", "") -- remove espaços
+        if targetName ~= "" then
+            changeCharacterTo(targetName)
+        else
+            game.StarterGui:SetCore("ChatMakeSystemMessage", {
+                Text = "⚠️ Use: ;char nome_do_jogador",
+                Color = Color3.fromRGB(255, 255, 0)
+            })
+        end
+    end
+end)
