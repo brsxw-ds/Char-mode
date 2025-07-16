@@ -1,0 +1,63 @@
+-- Char mode com ícone azul na tela
+-- Feito por Santos & ChatGPT
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Ícone azul real (link válido do imgur)
+local icon = Drawing.new("Image")
+icon.Data = game:HttpGet("https://i.imgur.com/Vz9W0eh.png") -- imagem azul real
+icon.Size = Vector2.new(60, 60)
+icon.Position = Vector2.new(20, 100)
+icon.Visible = true
+
+-- Mensagem de confirmação
+pcall(function()
+    game.StarterGui:SetCore("ChatMakeSystemMessage", {
+        Text = "✅ Char mode ativado! Use ;char nome_do_jogador",
+        Color = Color3.fromRGB(0, 170, 255)
+    })
+end)
+
+-- Função que troca a aparência
+local function changeCharacterTo(username)
+    local success, userId = pcall(function()
+        return Players:GetUserIdFromNameAsync(username)
+    end)
+
+    if success then
+        local desc = Players:GetHumanoidDescriptionFromUserId(userId)
+        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        character:WaitForChild("Humanoid"):ApplyDescription(desc)
+        pcall(function()
+            game.StarterGui:SetCore("ChatMakeSystemMessage", {
+                Text = "✅ Aparência trocada para: " .. username,
+                Color = Color3.fromRGB(0, 255, 0)
+            })
+        end)
+    else
+        pcall(function()
+            game.StarterGui:SetCore("ChatMakeSystemMessage", {
+                Text = "❌ Jogador não encontrado: " .. username,
+                Color = Color3.fromRGB(255, 0, 0)
+            })
+        end)
+    end
+end
+
+-- Ativa o comando ;char
+LocalPlayer.Chatted:Connect(function(msg)
+    if msg:lower():sub(1, 6) == ";char " then
+        local name = msg:sub(7):gsub("%s+", "")
+        if name ~= "" then
+            changeCharacterTo(name)
+        else
+            pcall(function()
+                game.StarterGui:SetCore("ChatMakeSystemMessage", {
+                    Text = "⚠️ Use: ;char nome_do_jogador",
+                    Color = Color3.fromRGB(255, 255, 0)
+                })
+            end)
+        end
+    end
+end)
